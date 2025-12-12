@@ -23,13 +23,16 @@ finance_agent = Agent(
     name="Finance Agent",
     role="Get financial data",
     model=OpenAIChat(id="gpt-4o"),
-    tools=[YFinanceTools(stock_price=True, analyst_recommendations=True, company_info=True, company_news=True)],
+    tools=[YFinanceTools(
+
+    )],
     instructions=["Always use tables to display data"],
     db=db,
     add_history_to_context=True,
     markdown=True,
 )
 
+# Team 只是一个逻辑结构，不是 Agent
 agent_team = Team(
     name="Agent Team (Web+Finance)",
     model=OpenAIChat(id="gpt-4o"),
@@ -38,8 +41,14 @@ agent_team = Team(
     markdown=True,
 )
 
-agent_os = AgentOS(agents=[agent_team])
+# Agno 2.x 必须把 agents 展开传入
+agent_os = AgentOS(
+    agents=[web_agent, finance_agent]
+)
+
 app = agent_os.get_app()
 
 if __name__ == "__main__":
+    # ⚠️ 这里必须写你的 Python 文件名 : app
+    # 假设你的文件名叫 finance_agent_team.py
     agent_os.serve(app="finance_agent_team:app", reload=True)
